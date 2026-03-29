@@ -1,0 +1,14 @@
+# Python 
+__pycache__/ 
+*.py[cod] 
+.ipynb_checkpoints/ 
+anaconda_projects/ 
+project_filebrowser.db 
+.DS_Store 
+Thumbs.db 
+.vscode/ 
+.env 
+*-checkpoint.py 
+*-checkpoint.md 
+venv/ 
+.venv/ 
