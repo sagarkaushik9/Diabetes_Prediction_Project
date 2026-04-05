@@ -95,6 +95,16 @@
       .card { padding: 18px; }
       h1 { font-size: 24px; }
     }
+    .field-hint {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.5;
+    margin-top: 4px;
+    padding: 6px 10px;
+    background: var(--input-bg);
+    border-left: 2px solid var(--border);
+    border-radius: 0 4px 4px 0;
+}
   </style>
 </head>
 <body>
@@ -141,6 +151,7 @@
         <input type="range" id="pregnancies" min="0" max="17" value="1" oninput="document.getElementById('preg-val').textContent=this.value">
         <span class="slider-val" id="preg-val">1</span>
       </div>
+      <div class="field-hint">Number of times pregnant. Enter 0 if never pregnant. Higher count increases risk.</div>
     </div>
 
     <div class="grid-2">
@@ -149,11 +160,13 @@
         <input type="number" id="glucose" placeholder="70–200" min="0" max="300">
         <span class="field-error" id="err-glucose">Enter a valid glucose value</span>
       </div>
+      <div class="field-hint">Blood sugar after 2hr glucose test. Normal: below 140. Pre-diabetic: 140–199. Diabetic: 200+</div>
       <div class="field">
         <label>Blood Pressure <span class="hint">mm Hg</span></label>
         <input type="number" id="blood_pressure" placeholder="40–120" min="0" max="200">
         <span class="field-error" id="err-bp">Enter a valid blood pressure</span>
       </div>
+      <div class="field-hint">Diastolic pressure (heart at rest). Normal: 60–80 mm Hg. High BP increases diabetes risk.</div>
     </div>
 
     <div class="grid-2">
@@ -162,11 +175,13 @@
         <input type="number" id="skin_thickness" placeholder="10–60" min="0" max="100">
         <span class="field-error" id="err-skin">Enter a valid value</span>
       </div>
+      <div class="field-hint">Triceps skin fold thickness. Measures body fat level. Normal range: 10–25 mm.</div>
       <div class="field">
         <label>Insulin <span class="hint">µU/mL</span></label>
         <input type="number" id="insulin" placeholder="0–800" min="0" max="900">
         <span class="field-error" id="err-insulin">Enter a valid value</span>
       </div>
+      <div class="field-hint">2-hour serum insulin after glucose test. Normal: 16–166 µU/mL. Enter 0 if unknown.</div>
     </div>
 
     <div class="grid-2" style="margin-bottom:16px">
@@ -175,11 +190,13 @@
         <input type="number" id="bmi" placeholder="18–60" step="0.1" min="0" max="100">
         <span class="field-error" id="err-bmi">Enter a valid BMI</span>
       </div>
+      <div class="field-hint">Weight(kg) / Height(m)². Normal: 18.5–24.9. Overweight: 25–29.9. Obese: 30+</div>
       <div class="field">
         <label>Age <span class="hint">years</span></label>
         <input type="number" id="age" placeholder="21–81" min="0" max="120">
         <span class="field-error" id="err-age">Enter a valid age</span>
       </div>
+      <div class="field-hint">Age in years. Minimum 21. Risk increases significantly after age 45.</div>
     </div>
 
     <div class="field" style="margin-bottom:22px">
@@ -187,7 +204,7 @@
       <input type="number" id="dpf" placeholder="e.g. 0.5" step="0.01" min="0" max="5" style="max-width:240px">
       <span class="field-error" id="err-dpf">Enter a valid DPF value</span>
     </div>
-
+    <div class="field-hint">Family history score. Low risk: 0.08–0.3. High risk: 0.6+. Enter 0.5 if unsure.</div>
     <button class="btn-predict" onclick="predict()">
       <span class="btn-text">Run prediction</span>
       <div class="spinner"></div>
@@ -238,7 +255,11 @@
     Models trained on Pima Indians Diabetes Dataset (768 samples)
   </p>
 </div>
-
+<div class="card" style="margin-top:20px">
+  <div class="card-title">Feature importance — Random Forest</div>
+  <canvas id="importanceChart" height="260"></canvas>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
 const FLASK_URL = "http://127.0.0.1:5000";
 let selectedModel = "rf";
@@ -366,6 +387,61 @@ document.querySelectorAll("input[type=number]").forEach(el => {
     if (err) err.classList.remove("show");
   });
 });
+</script>
+<script>
+async function loadImportanceChart() {
+  try {
+    const res = await fetch("http://127.0.0.1:5000/feature-importance");
+    const data = await res.json();
+
+    const labels = data.map(d => d.feature);
+    const values = data.map(d => d.importance);
+    const colors = values.map(v =>
+      v >= 20 ? "#c94a2e" : v >= 12 ? "#d4782a" : "#2a7a5a"
+    );
+
+    new Chart(document.getElementById("importanceChart"), {
+      type: "bar",
+      data: {
+        labels: labels,
+        datasets: [{
+          data: values,
+          backgroundColor: colors,
+          borderRadius: 6,
+          borderSkipped: false,
+        }]
+      },
+      options: {
+        indexAxis: "y",
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => ` ${ctx.raw.toFixed(1)}% importance`
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: "rgba(0,0,0,0.05)" },
+            ticks: {
+              callback: val => val + "%",
+              font: { family: "DM Sans", size: 12 }
+            }
+          },
+          y: {
+            grid: { display: false },
+            ticks: { font: { family: "DM Sans", size: 13 } }
+          }
+        }
+      }
+    });
+  } catch(e) {
+    console.log("Chart error:", e);
+  }
+}
+loadImportanceChart();
 </script>
 </body>
 </html>

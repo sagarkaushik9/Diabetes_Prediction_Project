@@ -101,6 +101,25 @@ def get_models():
 def health():
     return jsonify({"status": "ok", "models_loaded": {k: v is not None for k, v in models.items()}})
 
+@app.route("/feature-importance", methods=["GET"])
+def feature_importance():
+    rf = models.get("rf")
+    if rf is None:
+        return jsonify({"error": "Random Forest not loaded"}), 500
+    
+    feature_names = [
+        "Pregnancies", "Glucose", "Blood Pressure",
+        "Skin Thickness", "Insulin", "BMI", "DPF", "Age"
+    ]
+    importances = rf.feature_importances_.tolist()
+    
+    data = sorted(
+        [{"feature": f, "importance": round(i * 100, 2)} 
+         for f, i in zip(feature_names, importances)],
+        key=lambda x: x["importance"],
+        reverse=True
+    )
+    return jsonify(data)
 
 if __name__ == "__main__":
     print("Starting Flask server on http://127.0.0.1:5000")
