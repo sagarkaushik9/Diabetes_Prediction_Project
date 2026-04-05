@@ -2,7 +2,6 @@
 A machine learning web application that predicts diabetes risk using 3 ML models trained on the Pima Indians Diabetes Dataset.
 
 ## Feature Importance Chart
-![Feature Importance](results/feature_importance.png)
 
 <img width="796" height="949" alt="image" src="https://github.com/user-attachments/assets/e0cd7b2b-ec35-4c89-9df0-e75373d8ed16" />
 <img width="796" height="963" alt="image" src="https://github.com/user-attachments/assets/701e962e-5f19-47aa-bd4b-3665e759f371" />
