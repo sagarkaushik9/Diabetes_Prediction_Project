@@ -50,7 +50,7 @@ Diabetes_Prediction_Project/
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/Diabetes_Prediction_Project.git
+git clone https://github.com/sagarkaushik9/Diabetes_Prediction_Project.git
 cd Diabetes_Prediction_Project
 ```
 
@@ -106,7 +106,7 @@ Response:
 This tool is for **educational purposes only** and is not a substitute for medical diagnosis. Always consult a qualified healthcare professional.
 
 ## Author
-Your Name — [GitHub](https://github.com/YOUR_USERNAME)
+Your Name — [GitHub](https://github.com/sagarkaushik9)
 =======
 # Diabetes_Prediction_Project
 A machine learning web application that predicts diabetes risk using 3 ML models trained on the Pima Indians Diabetes Dataset.
